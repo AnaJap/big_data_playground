@@ -3,7 +3,7 @@
  ძალიან დიდი იმიჯია და პირველ compose-ს დიდი დრო დასჭირდება და გაითვალისწინეთ. საკმაოდ resource intensive-ც შეიძლება იყოს.
  
 ---
-** Build command **
+**Docker build command**
 
 docker build -t airflow_spark . --build-arg SPARK_VERSION=2.4.7 --build-arg HADOOP_VERSION=3.1.0 --build-arg SCALA_VERSION=2.12 --build-arg PYTHON_VERSION=3.7 --build-arg SQLALCHEMY_VERSION=1.3 --build-arg AIRFLOW_VERSION=2.1 
 
