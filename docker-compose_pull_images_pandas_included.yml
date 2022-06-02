@@ -3,7 +3,7 @@ services:
   postgres:
     image: postgres:9.6
     volumes:
-      - //d/leaderator_mounted_volumes/arf_pg_data:/var/lib/postgresql/data
+      - //d/BigDataPlayground/local/arf_pg_data:/var/lib/postgresql/data
     ports:
       - "5433"
     environment:
@@ -13,7 +13,7 @@ services:
       PGPORT: 5433
     restart: always
   airflow_with_spark:
-    image: docker.io/anajaparidze/big_data_playground:arf_2.1.4-sp_2.4
+    image: docker.io/anajaparidze/airflow_spark:airflow_2.1.4-spark_2.4.7
     ports:
       - "5433"
       - 8080:8080
@@ -33,20 +33,20 @@ services:
                             && echo '### Starting webserver... '                            
                             && airflow webserver"]
     volumes:
-      - //d/leaderator_mounted_volumes/dags:/airflow/dags
-      - //d/leaderator_mounted_volumes/jobs:/airflow/jobs
-      - //d/leaderator_mounted_volumes/data:/airflow/data    
+      - //d/BigDataPlayground/local/dags:/airflow/dags
+      - //d/BigDataPlayground/local/jobs:/airflow/jobs
+      - //d/BigDataPlayground/local/data:/airflow/data    
       - airflow_logs:/airflow/logs/  
 
-  pyspark-notebook:
-      image: kublr/pyspark-notebook:spark-2.4.0-hadoop-2.6
+  jupyter:
+      image: docker.io/anajaparidze/jupyter_spark_pandas:spark_2.4.0-pandas_1.1.5
       volumes:
-        - //d/leaderator_mounted_volumes/notebooks:/jupyter
+        - //d/BigDataPlayground/local/notebooks:/jupyter
       user: root
-      container_name: pyspark-notebook
-      hostname: pyspark-notebook
+      container_name: jupyter
+      hostname: jupyter
       ports:
-        - 8282:8888             
+        - 8888:8888             
       
 volumes:
   airflow_logs: {}
