@@ -1,0 +1,52 @@
+version: '2'
+services:
+  postgres:
+    image: postgres:9.6
+    volumes:
+      - //d/leaderator_mounted_volumes/arf_pg_data:/var/lib/postgresql/data
+    ports:
+      - "5433"
+    environment:
+      POSTGRES_USER: airflow
+      POSTGRES_PASSWORD: airflow
+      POSTGRES_DB: airflow
+      PGPORT: 5433
+    restart: always
+  airflow_with_spark:
+    image: docker.io/anajaparidze/big_data_playground:arf_2.1.4-sp_2.4
+    ports:
+      - "5433"
+      - 8080:8080
+    environment:
+      AIRFLOW__CORE__FERNET_KEY: 8NE6O6RcTJpxcCkuKxOHOExzIJkXkeJKbRie03a69dI=
+      AIRFLOW__CORE__SQL_ALCHEMY_CONN: postgresql://airflow:airflow@postgres:5433/airflow
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor      
+    restart: always
+    command: ["bash", "-c", "echo '### Testing connection... '
+                            && python test_db_conn.py 
+                            && echo '### Running DB Init... '
+                            && airflow db init 
+                            && echo '### Starting scheduler... '
+                            && airflow scheduler -D
+                            && echo '### Sleeping 10 seconds... '                            
+                            && sleep 10
+                            && echo '### Starting webserver... '                            
+                            && airflow webserver"]
+    volumes:
+      - //d/leaderator_mounted_volumes/dags:/airflow/dags
+      - //d/leaderator_mounted_volumes/jobs:/airflow/jobs
+      - //d/leaderator_mounted_volumes/data:/airflow/data    
+      - airflow_logs:/airflow/logs/  
+
+  pyspark-notebook:
+      image: kublr/pyspark-notebook:spark-2.4.0-hadoop-2.6
+      volumes:
+        - //d/leaderator_mounted_volumes/notebooks:/jupyter
+      user: root
+      container_name: pyspark-notebook
+      hostname: pyspark-notebook
+      ports:
+        - 8282:8888             
+      
+volumes:
+  airflow_logs: {}
